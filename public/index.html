@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTML to Object Parser</title>
+</head>
+
+<body>
+  <textarea id="htmlInput" rows="10" cols="50"></textarea>
+  <button onclick="parseHTML()">Parse</button>
+  <pre id="output"></pre>
+
+  <script>
+    function parseHTML() {
+      const htmlContent = document.getElementById('htmlInput').value;
+
+      fetch('http://localhost:3000/parseHtml', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ html: htmlContent }),
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          const contentType = response.headers.get("content-type");
+          if (contentType && contentType.indexOf("application/json") !== -1) {
+            return response.json();
+          } else {
+            throw new Error('Unexpected response content type');
+          }
+        })
+        .then(data => {
+          document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+        })
+        .catch(error => {
+          console.error('There was a problem with the fetch operation:', error);
+        });
+    }
+  </script>
+</body>
+
+</html>
